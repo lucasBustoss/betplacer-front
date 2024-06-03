@@ -1,0 +1,58 @@
+body {
+  background: #2a2a2a;
+  font-family: 'Roboto';
+  color: rgb(253, 252, 225);
+  padding: 20px;
+}
+
+.v-card {
+  background-color: inherit !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  box-shadow: inherit !important;
+}
+
+.v-expansion-panel {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #eee !important;
+  border: 1px solid #eee;
+  border-radius: 2px;
+  margin-top: 10px;
+}
+
+.v-expansion-panel-header:hover {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+  transition: 170ms linear;
+}
+
+.v-expansion-panel-header__icon {
+  background-color: #bbb !important;
+  border-radius: 20px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* GLOBAL CSS */
+
+.global-no-select-text {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.v-data-table {
+  background: inherit !important;
+}
