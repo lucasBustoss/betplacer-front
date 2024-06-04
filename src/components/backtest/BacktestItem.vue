@@ -2,7 +2,7 @@
   <router-link
     :to="{
       name: 'BacktestDetails',
-      params: { id: backtest.id, backtest },
+      params: { id: backtest.code, backtest },
     }"
   >
     <div class="backtest-item">

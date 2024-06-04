@@ -39,31 +39,31 @@ export const backtestResultTeamType = [
 export const backtestFilterItems = [
   {
     name: '% de jogos sendo primeiro a marcar',
-    propName: 'FtsFilter'
+    propName: 'firstToScorePercent'
   },
   {
     name: '% de jogos sendo primeiro a marcar 2x0',
-    propName: 'TwoZeroFilter'
+    propName: 'twoZeroPercent'
   },
   {
     name: '% de jogos sem sofrer gols',
-    propName: 'CleanSheetsFilter'
+    propName: 'cleanSheetPercent'
   },
   {
     name: '% de jogos em que não marcou gols',
-    propName: 'FailedToScoreFilter'
+    propName: 'failedToScorePercent'
   },
   {
     name: '% de jogos em que os dois times marcaram',
-    propName: 'BothToScoreFilter'
+    propName: 'bothToScorePercent'
   },
   {
     name: 'Média de gols marcados',
-    propName: 'AverageGoalsScoredFilter'
+    propName: 'avgGoalsScored'
   },
   {
     name: 'Média de gols sofridos',
-    propName: 'AverageGoalsConcededFilter'
+    propName: 'avgGoalsConceded'
   },
 ]
 

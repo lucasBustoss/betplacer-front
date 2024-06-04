@@ -25,6 +25,12 @@ export default new Router({
             name: 'BacktestDetails',
             component: BacktestDetail,
             props: true
+        },
+        {
+            path: '/backtest/create',
+            name: 'BacktestDetails',
+            component: BacktestDetail,
+            props: false
         }
     ]
 })
