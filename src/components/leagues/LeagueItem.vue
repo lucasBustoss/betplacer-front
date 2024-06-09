@@ -2,10 +2,13 @@
   <v-expansion-panel>
     <v-expansion-panel-header class="expansion-panel-header">
       <div class="league-item-content">
-        <img class="league-item-image" src="https://flagcdn.com/80x60/ua.png" />
+        <img
+          class="league-item-image"
+          :src="`https://flagcdn.com/80x60/${getAlpha2Code(leagueCountry)}.png`"
+        />
         <div class="league-item-name">
-          <div class="league-item-name-country">Ukraine</div>
-          {{ ` - Primeira Liga`.replace(/ /g, "&nbsp;") }}
+          <div class="league-item-name-country">{{ leagueCountry }}</div>
+          {{ ` - ${leagueName}`.replace(/ /g, "&nbsp;") }}
         </div>
       </div>
     </v-expansion-panel-header>
@@ -14,7 +17,7 @@
       <v-data-table
         dense
         :headers="headers"
-        :items="items"
+        :items="leagueFixtures"
         item-key="name"
         dark
         hide-default-footer
@@ -26,21 +29,21 @@
               {{ item.date }}
             </td>
             <td class="table-game-item-column column-match">
-              {{ item.match }}
+              {{ `${item.homeTeamName} x ${item.awayTeamName}` }}
             </td>
             <td class="table-game-item-column column-odd">
               <div class="item-odd-container">
-                {{ item.odd_home.toFixed(2) }}
+                {{ item.oddHome.toFixed(2) }}
               </div>
             </td>
             <td class="table-game-item-column column-odd">
               <div class="item-odd-container">
-                {{ item.odd_draw.toFixed(2) }}
+                {{ item.oddDraw.toFixed(2) }}
               </div>
             </td>
             <td class="table-game-item-column column-odd">
               <div class="item-odd-container">
-                {{ item.odd_away.toFixed(2) }}
+                {{ item.oddAway.toFixed(2) }}
               </div>
             </td>
           </tr>
@@ -51,7 +54,10 @@
 </template>
 
 <script>
+import { countryList } from "@/utils/countryCodes";
+
 export default {
+  props: ["leagueName", "leagueCountry", "leagueFixtures"],
   data() {
     return {
       headers: [
@@ -79,33 +85,15 @@ export default {
           value: "odd_away",
         },
       ],
-      items: [
-        {
-          id: 1,
-          date: "30/05/2024 12:00",
-          match: "São Paulo x Talleres",
-          odd_home: 1.7,
-          odd_draw: 3.5,
-          odd_away: 4.7,
-        },
-        {
-          id: 2,
-          date: "30/05/2024 12:00",
-          match: "São Paulo x Talleres",
-          odd_home: 1.7,
-          odd_draw: 3.5,
-          odd_away: 4.7,
-        },
-        {
-          id: 3,
-          date: "30/05/2024 12:00",
-          match: "São Paulo x Talleres",
-          odd_home: 1.7,
-          odd_draw: 3.5,
-          odd_away: 4.7,
-        },
-      ],
+      fixtures: [],
+      fixturesByDate: [],
     };
+  },
+  methods: {
+    getAlpha2Code(countryName) {
+      const alpha2Code = countryList[countryName];
+      return alpha2Code ? alpha2Code.toLowerCase() : null;
+    },
   },
 };
 </script>
