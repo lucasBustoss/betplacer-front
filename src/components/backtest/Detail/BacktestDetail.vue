@@ -1,9 +1,14 @@
 <template>
   <div class="backtest-detail">
-    <router-link to="/backtest">
-      <div class="backtest-detail-back">Voltar</div>
-    </router-link>
+    <div class="backtest-detail-navigation">
+      <router-link to="/backtest" class="backtest-detail-back">
+        Voltar
+      </router-link>
 
+      <div class="backtest-detail-save" @click="saveFilters">
+        Salvar filtros
+      </div>
+    </div>
     <div class="backtest-detail-header">
       <h2>{{ currentBacktest ? currentBacktest.name : "Criar backtest" }}</h2>
     </div>
@@ -365,6 +370,9 @@ export default {
         this.isLoading = false;
       }
     },
+    async saveFilters() {
+      console.log(this.currentBacktest.filters);
+    },
   },
   async mounted() {
     if (!this.backtest) {
@@ -385,13 +393,34 @@ export default {
   width: 100%;
 }
 
+.backtest-detail-navigation {
+  display: flex;
+  width: 100%;
+}
+
 .backtest-detail-back {
   padding: 15px;
   cursor: pointer;
   border: 1px solid #555;
-  width: 6%;
+  width: 10%;
   border-radius: 10px;
   text-align: center;
+}
+
+.backtest-detail-save {
+  padding: 15px;
+  cursor: pointer;
+  border: 1px solid #555;
+  background: rgba(255, 255, 255, 0.2);
+  width: 10%;
+  margin-left: 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.backtest-detail-save:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transition: 0.15s linear;
 }
 
 .backtest-detail-back:hover {

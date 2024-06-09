@@ -46,6 +46,11 @@
                 {{ item.oddAway.toFixed(2) }}
               </div>
             </td>
+            <td class="table-game-item-column column-odd">
+              <div class="item-odd-container">
+                {{ item.filters }}
+              </div>
+            </td>
           </tr>
         </template>
       </v-data-table>
@@ -83,6 +88,11 @@ export default {
           text: "Odd Away",
           class: "table-odd-header",
           value: "odd_away",
+        },
+        {
+          text: "Filtros",
+          class: "table-odd-header",
+          value: "backtestFilters",
         },
       ],
       fixtures: [],

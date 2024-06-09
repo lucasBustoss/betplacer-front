@@ -17,6 +17,10 @@
         <div>Resultado: {{ getFormattedResult(backtest) }}%</div>
         <div>Good run máxima: {{ backtest.maxGoodRun }}</div>
         <div>Bad run máxima: {{ backtest.maxBadRun }}</div>
+        <div>
+          Filtros usados nas partidas:
+          {{ backtest.usesInFixture ? "Sim" : "Não" }}
+        </div>
       </div>
     </div>
   </router-link>
