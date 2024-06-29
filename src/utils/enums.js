@@ -36,64 +36,6 @@ export const backtestResultTeamType = [
   }
 ]
 
-export const backtestFilterItems = [
-  {
-    name: '% de jogos sendo primeiro a marcar',
-    propName: 'firstToScorePercent'
-  },
-  {
-    name: '% de jogos sendo primeiro a marcar 2x0',
-    propName: 'twoZeroPercent'
-  },
-  {
-    name: '% de jogos sem sofrer gols',
-    propName: 'cleanSheetPercent'
-  },
-  {
-    name: '% de jogos em que não marcou gols',
-    propName: 'failedToScorePercent'
-  },
-  {
-    name: '% de jogos em que os dois times marcaram',
-    propName: 'bothToScorePercent'
-  },
-  {
-    name: 'Média de gols marcados',
-    propName: 'avgGoalsScored'
-  },
-  {
-    name: 'Média de gols sofridos',
-    propName: 'avgGoalsConceded'
-  },
-  {
-    name: '% de jogos sendo primeiro a marcar no HT',
-    propName: 'firstToScorePercentHT'
-  },
-  {
-    name: '% de jogos sendo primeiro a marcar 2x0 no HT',
-    propName: 'twoZeroPercentHT'
-  },
-  {
-    name: '% de jogos sem sofrer gols no HT',
-    propName: 'cleanSheetPercentHT'
-  },
-  {
-    name: '% de jogos em que não marcou gols no HT',
-    propName: 'failedToScorePercentHT'
-  },
-  {
-    name: '% de jogos em que os dois times marcaram no HT',
-    propName: 'bothToScorePercentHT'
-  },
-  {
-    name: 'Média de gols marcados no HT',
-    propName: 'avgGoalsScoredHT'
-  },
-  {
-    name: 'Média de gols sofridos no HT',
-    propName: 'avgGoalsConcededHT'
-  },
-]
 
 export const backtestCompareType = [
   {

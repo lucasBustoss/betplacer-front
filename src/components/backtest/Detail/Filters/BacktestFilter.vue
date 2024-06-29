@@ -9,7 +9,7 @@
       <div class="backtest-filter">
         <div class="backtest-filter-name">
           <v-select
-            :items="filterItems"
+            :items="filterItemsName"
             v-model="selectedFilter"
             :disabled="!isCreate"
             filled
@@ -65,6 +65,18 @@
         <div class="backtest-filter-content backtest-filter-values">
           <div class="backtest-filter-value">
             <v-text-field
+              label="Quantidade min. de jogos"
+              v-model="minCountMatches"
+              @change="updateFilter"
+              :disabled="!isCreate"
+              filled
+              dark
+              dense
+            >
+            </v-text-field>
+          </div>
+          <div class="backtest-filter-value">
+            <v-text-field
               label="Valor inicial"
               v-model="initialValue"
               @change="updateFilter"
@@ -95,17 +107,16 @@
 
 <script>
 import {
-  backtestFilterItems,
   backtestCompareType,
   backtestTeamType,
   backtestPropType,
 } from "@/utils/enums";
 
 export default {
-  props: ["filter", "isCreate"],
+  props: ["filter", "isCreate", "filterItems"],
   computed: {
-    filterItems() {
-      return backtestFilterItems.map((b) => b.name);
+    filterItemsName() {
+      return this.filterItems.map((b) => b.name);
     },
     compareTypeItems() {
       return backtestCompareType.map((b) => b.name);
@@ -119,7 +130,7 @@ export default {
   },
   data() {
     return {
-      selectedFilter: this.filter ? this.filter.name : null,
+      selectedFilter: this.filter ? this.filter.filterName : null,
       compareType:
         this.filter && this.filter.compareType
           ? this.getCompareTypeName(this.filter.compareType)
@@ -132,6 +143,7 @@ export default {
         this.filter && this.filter.propType
           ? this.getPropTypeName(this.filter.propType)
           : null,
+      minCountMatches: this.filter ? this.filter.minCountMatches : null,
       initialValue: this.filter ? this.filter.initialValue : null,
       finalValue: this.filter ? this.filter.finalValue : null,
     };
@@ -147,16 +159,27 @@ export default {
       return backtestPropType.find((b) => b.id === propType).name;
     },
     updateFilter() {
+      let filterCode = 0;
+      let filterName = "";
+
       if (this.selectedFilter) {
-        this.name = this.selectedFilter;
+        const filter = this.filterItems.find(
+          (f) => f.name === this.selectedFilter
+        );
+
+        if (filter) {
+          filterCode = filter.code;
+          filterName = filter.name;
+        }
       }
 
       this.$emit("updateFilter", {
-        selectedFilter: this.selectedFilter,
+        filterCode,
+        filterName,
         compareType: this.compareType,
+        minCountMatches: this.minCountMatches,
         initialValue: this.initialValue,
         finalValue: this.finalValue,
-        name: this.name,
         propType: this.propType,
         sequence: this.filter.sequence,
         teamType: this.teamType,
@@ -189,6 +212,6 @@ export default {
 }
 
 .backtest-filter-value {
-  width: 48%;
+  width: 32%;
 }
 </style>

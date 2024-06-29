@@ -1,7 +1,30 @@
 <template>
   <div class="league-list">
     <div class="league-list-header">
-      <v-btn @click="filterFixtures">Filtrar jogos</v-btn>
+      <div>
+        <v-btn>Filtrar jogos</v-btn>
+      </div>
+      <div class="league-list-header-date">
+        <v-icon
+          class="date-pick-icon"
+          @click="setPreviousDay"
+          size="30"
+          dark
+          v-if="checkShowDatePrevious()"
+          >mdi-chevron-left</v-icon
+        >
+        <div class="header-date-string">
+          {{ getFormattedDate() }}
+        </div>
+        <v-icon
+          class="date-pick-icon"
+          @click="setNextDay"
+          size="30"
+          dark
+          v-if="checkShowDateNext()"
+          >mdi-chevron-right</v-icon
+        >
+      </div>
     </div>
 
     <hr />
@@ -14,6 +37,7 @@
           :leagueCountry="i.leagueCountry"
           :leagueFixtures="i.fixtures"
           :key="i.leagueCode"
+          @updateOdds="updateOdds"
         />
       </v-expansion-panels>
     </div>
@@ -21,12 +45,10 @@
 </template>
 
 <script>
-import { format } from "date-fns";
+import { format, startOfDay, addDays } from "date-fns";
 
-import { backtestApi, fixturesApi } from "@/config/api";
+import { fixturesApi } from "@/config/api";
 import LeagueItem from "./LeagueItem.vue";
-
-import { backtestFilterItems } from "@/utils/enums";
 
 export default {
   components: { LeagueItem },
@@ -36,59 +58,32 @@ export default {
       fixturesByDate: [],
       date: new Date(),
       isLoading: false,
+      filters: [],
     };
   },
   methods: {
-    async filterFixtures() {
-      const backtests = await this.getBacktestsWithFilterFixture();
-      const backtestFixtures = [];
-
-      for (const backtest of backtests) {
-        const filteredFixtures = [];
-
-        for (const filter of backtest.filters) {
-          const fullFilter = this.getFullPropName(filter);
-
-          for (const fixtureByDate of this.fixturesByDate) {
-            for (const fixture of fixtureByDate.fixtures) {
-              if (filter.compareType === 1) {
-                if (
-                  fixture.stats[fullFilter] > filter.initialValue &&
-                  fixture.stats[fullFilter] < filter.finalValue
-                ) {
-                  filteredFixtures.push(fixture);
-                }
-              } else {
-                if (
-                  fixture.stats[fullFilter] >= filter.initialValue &&
-                  fixture.stats[fullFilter] <= filter.finalValue
-                ) {
-                  filteredFixtures.push(fixture);
-                }
-              }
-            }
-          }
-        }
-
-        if (filteredFixtures.length > 0) {
-          for (const filteredFixture of filteredFixtures) {
-            backtestFixtures.push({
-              backtestCode: backtest.code,
-              fixtureCode: filteredFixture.code,
-            });
-          }
-        }
-      }
-
-      await backtestApi.post("/fixtures", backtestFixtures);
-
+    getFormattedDate() {
+      return format(this.date, "dd/MM/yyyy");
+    },
+    checkShowDatePrevious() {
+      return startOfDay(this.date) > startOfDay(new Date());
+    },
+    checkShowDateNext() {
+      return startOfDay(this.date) < addDays(startOfDay(new Date()), 2);
+    },
+    async setPreviousDay() {
+      this.date = addDays(this.date, -1);
+      await this.getFixtures();
+    },
+    async setNextDay() {
+      this.date = addDays(this.date, 1);
       await this.getFixtures();
     },
     getFullPropName(filter) {
       let prefix = "";
       let suffix = "";
-      const rawProp = backtestFilterItems.find((f) => f.name === filter.name);
-      const capitalizeProp = this.capitalizeProp(rawProp.propName);
+      const rawProp = this.filters.find((f) => f.name === filter.filterName);
+      const capitalizeProp = this.capitalizeProp(rawProp.prop);
 
       if (filter.teamType === 1) {
         prefix = "home";
@@ -109,6 +104,7 @@ export default {
       return `${prefix}${capitalizeProp}${suffix}`;
     },
     capitalizeProp(prop) {
+      console.log(prop);
       return prop.charAt(0).toUpperCase() + prop.slice(1);
     },
     async getFixtures() {
@@ -129,17 +125,23 @@ export default {
 
       this.isLoading = false;
     },
-    async getBacktestsWithFilterFixture() {
-      const response = await backtestApi.get("?onlyWithFilterFixture=true");
-
-      if (response && response.data && response.data.data) {
-        return response.data.data;
-      }
-
-      return [];
+    async updateOdds(odds) {
+      const oddsToUpdate = {
+        fixtureCode: odds.fixtureCode,
+        oddHome: odds.homeOdd,
+        oddDraw: odds.drawOdd,
+        oddAway: odds.awayOdd,
+        oddOver25: odds.over25Odd,
+        oddUnder25: odds.under25Odd,
+        oddBttsYes: odds.bttsYesOdd,
+        oddBttsNo: odds.bttsNoOdd,
+      };
+      await fixturesApi.put("/odds", oddsToUpdate);
+      await this.getFixtures();
     },
   },
   async mounted() {
+    // await this.getFiltersDb();
     await this.getFixtures();
   },
 };
@@ -154,11 +156,27 @@ export default {
 
 .league-list-header {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
   margin-bottom: 25px;
 }
 
+.league-list-header-date {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  display: flex;
+}
+
+.header-date-string {
+  margin-top: 3px;
+}
+
 .league-list-content {
   margin-top: 25px;
+}
+
+.date-pick-icon {
+  cursor: pointer;
 }
 </style>

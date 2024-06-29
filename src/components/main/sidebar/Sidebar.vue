@@ -36,6 +36,28 @@
             >
           </v-list-item>
         </router-link>
+        <router-link to="/fixtures-without-odds">
+          <v-list-item link class="sidebar-item">
+            <v-list-item-icon>
+              <v-icon class="sidebar-icon"
+                >mdi-chart-box-multiple-outline</v-icon
+              >
+            </v-list-item-icon>
+            <v-list-item-title class="sidebar-item-title"
+              >Jogos sem odds</v-list-item-title
+            >
+          </v-list-item>
+        </router-link>
+        <router-link to="/leagues">
+          <v-list-item link class="sidebar-item">
+            <v-list-item-icon>
+              <v-icon class="sidebar-icon">mdi-format-list-checkbox</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title class="sidebar-item-title"
+              >Ligas</v-list-item-title
+            >
+          </v-list-item>
+        </router-link>
       </v-list>
     </v-navigation-drawer>
   </div>

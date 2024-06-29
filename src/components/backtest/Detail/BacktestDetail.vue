@@ -5,7 +5,11 @@
         Voltar
       </router-link>
 
-      <div class="backtest-detail-save" @click="saveFilters">
+      <div
+        class="backtest-detail-save"
+        @click="saveFilters"
+        v-if="currentBacktest"
+      >
         Salvar filtros
       </div>
     </div>
@@ -91,16 +95,19 @@
       <div class="backtest-detail-form-filters">
         <v-expansion-panels v-if="filters.length > 0">
           <BacktestFilter
-            v-for="(filter, i) in filters"
+            v-for="(backtestFilter, i) in backtestFilters"
             :key="i"
-            :filter="filter"
+            :filter="backtestFilter"
+            :filterItems="filters"
             :isCreate="!currentBacktest"
             @updateFilter="updateFilter"
           />
         </v-expansion-panels>
 
         <div v-if="!currentBacktest" class="backtest-detail-form-filters-add">
-          <v-btn @click="addFilter(filters.length + 1)">Adicionar filtro</v-btn>
+          <v-btn @click="addFilter(backtestFilters.length + 1)"
+            >Adicionar filtro</v-btn
+          >
         </div>
       </div>
     </div>
@@ -111,7 +118,7 @@
 
     <hr :class="!currentBacktest ? 'hr-mg-top' : ''" />
 
-    <div class="backtest-detail-lists" v-if="currentBacktest">
+    <!-- <div class="backtest-detail-lists" v-if="currentBacktest">
       <div class="backtest-detail-list-item">
         <BacktestList title="Resultado por liga" :items="leagueTableItems" />
       </div>
@@ -124,7 +131,7 @@
       <div class="backtest-detail-list-item">
         <BacktestList title="Resultado por equipe" :items="teamTableItems" />
       </div>
-    </div>
+    </div> -->
 
     <div class="backtest-create-container" v-if="!currentBacktest">
       <v-btn @click="createBacktest" class="backtest-create-container-button">
@@ -138,12 +145,11 @@
 <script>
 import Loading from "@/components/main/Loading/Loading.vue";
 import BacktestFilter from "@/components/backtest/Detail/Filters/BacktestFilter.vue";
-import BacktestList from "@/components/backtest/Detail/Lists/BacktestList.vue";
+// import BacktestList from "@/components/backtest/Detail/Lists/BacktestList.vue";
 import BacktestResultBullet from "@/components/backtest/Detail/Result/BacktestResultBullet.vue";
 import {
   backtestResultType,
   backtestResultTeamType,
-  backtestFilterItems,
   backtestCompareType,
   backtestTeamType,
   backtestPropType,
@@ -153,7 +159,11 @@ import { backtestApi } from "@/config/api";
 
 export default {
   props: ["backtest"],
-  components: { Loading, BacktestFilter, BacktestList, BacktestResultBullet },
+  components: {
+    Loading,
+    BacktestFilter /*, BacktestList*/,
+    BacktestResultBullet,
+  },
   computed: {
     resultTypeItems() {
       return backtestResultType.map((r) => r.name);
@@ -196,9 +206,10 @@ export default {
       selectedResultTeamType: this.backtest
         ? this.getResultTeamTypeName(this.backtest.teamType)
         : null,
-      filters:
+      backtestFilters:
         this.backtest && this.backtest.filters ? this.backtest.filters : [],
       isLoading: false,
+      filters: [],
     };
   },
   methods: {
@@ -226,17 +237,20 @@ export default {
       return backtestPropType.find((b) => b.name === propType).id;
     },
     getFilterValue(filter) {
-      return backtestFilterItems.find((bft) => bft.name === filter).propName;
+      return this.filters.find((bft) => bft.name === filter).propName;
     },
     addFilter(sequence) {
       const lastInsert =
-        this.filters.length > 0 ? this.filters[this.filters.length - 1] : null;
+        this.backtestFilters.length > 0
+          ? this.backtestFilters[this.backtestFilters.length - 1]
+          : null;
 
       if (
         lastInsert &&
         (!lastInsert.compareType ||
           !lastInsert.teamType ||
           !lastInsert.propType ||
+          !lastInsert.minCountMatches ||
           !lastInsert.initialValue ||
           !lastInsert.finalValue)
       ) {
@@ -252,34 +266,30 @@ export default {
         compareType: null,
         teamType: null,
         propType: null,
+        minCountMatches: null,
         initialValue: null,
         finalValue: null,
       };
 
-      this.filters.push(filter);
+      this.backtestFilters.push(filter);
     },
     updateFilter(filter) {
-      const selectedFilterIndex = this.filters.findIndex(
+      const selectedFilterIndex = this.backtestFilters.findIndex(
         (f) => f.sequence === filter.sequence
       );
 
       if (selectedFilterIndex > -1) {
-        this.filters[selectedFilterIndex] = filter;
+        this.backtestFilters[selectedFilterIndex] = filter;
       }
     },
     treatFiltersToInsert() {
       const filters = {};
 
-      for (const filter of this.filters) {
+      for (const filter of this.backtestFilters) {
         filter.compareType = this.getCompareTypeValue(filter.compareType);
         filter.teamType = this.getTeamTypeValue(filter.teamType);
         filter.propType = this.getPropTypeValue(filter.propType);
-
-        const propName = this.getFilterValue(filter.name);
-        filter.name = undefined;
         filter.sequence = undefined;
-        filter.selectedFilter = undefined;
-        filters[propName] = filter;
       }
 
       return filters;
@@ -306,14 +316,14 @@ export default {
         return false;
       }
 
-      if (this.filters.length === 0) {
+      if (this.backtestFilters.length === 0) {
         showError(
           "É necessário informar pelo menos 1 filtro. Verifique e tente novamente"
         );
         return false;
       }
 
-      for (const filter of this.filters) {
+      for (const filter of this.backtestFilters) {
         if (filter.finalValue < filter.initialValue) {
           showError(
             `O valor final deve ser maior que o valor inicial. Verifique o filtro '${filter.name}' e tente novamente`
@@ -337,7 +347,7 @@ export default {
           this.selectedResultTeamType = this.getResultTeamTypeName(
             this.currentBacktest.teamType
           );
-          this.filters = this.currentBacktest.filters;
+          this.backtestFilters = this.currentBacktest.filters;
         }
       } catch (err) {
         showError(err);
@@ -350,7 +360,7 @@ export default {
         return;
       }
 
-      const treatedFilters = this.treatFiltersToInsert(this.filters);
+      this.treatFiltersToInsert();
 
       const backtest = {
         name: this.name,
@@ -358,7 +368,7 @@ export default {
         resultTeamType: this.getResultTeamTypeValue(
           this.selectedResultTeamType
         ),
-        filters: treatedFilters,
+        filters: this.backtestFilters,
       };
 
       try {
@@ -373,8 +383,22 @@ export default {
     async saveFilters() {
       console.log(this.currentBacktest.filters);
     },
+    async getFiltersDb() {
+      try {
+        const response = await backtestApi.get("/filters");
+
+        if (response && response.data && response.data.data) {
+          this.filters = response.data.data;
+        }
+      } catch (err) {
+        showError(err);
+      } finally {
+        this.isLoading = false;
+      }
+    },
   },
   async mounted() {
+    this.getFiltersDb();
     if (!this.backtest) {
       const backtestId = this.$route.params.id;
 

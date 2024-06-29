@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import LeagueList from "@/components/leagues/LeagueList";
+import LeagueList from "@/components/leagues-matches/LeagueList";
 
 export default {
   components: { LeagueList },
