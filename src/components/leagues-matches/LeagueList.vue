@@ -2,7 +2,18 @@
   <div class="league-list">
     <div class="league-list-header">
       <div>
-        <v-btn>Filtrar jogos</v-btn>
+        <v-btn
+          class="btn-sync-matches"
+          :disabled="isLoading"
+          @click="syncMatches"
+          >Sincronizar jogos</v-btn
+        >
+        <v-btn
+          class="btn-filter-matches"
+          :disabled="isLoading"
+          @click="analyzeMatches"
+          >Filtrar jogos</v-btn
+        >
       </div>
       <div class="league-list-header-date">
         <v-icon
@@ -29,8 +40,9 @@
 
     <hr />
 
-    <div class="league-list-content" v-if="!isLoading">
-      <v-expansion-panels multiple>
+    <div class="league-list-content">
+      <Loading v-if="isLoading" color="#efefef" size="30" />
+      <v-expansion-panels multiple v-else>
         <LeagueItem
           v-for="i in fixturesByDate"
           :leagueName="i.leagueName"
@@ -47,11 +59,12 @@
 <script>
 import { format, startOfDay, addDays } from "date-fns";
 
-import { fixturesApi } from "@/config/api";
+import { fixturesApi, punterApi, syncApi } from "@/config/api";
 import LeagueItem from "./LeagueItem.vue";
+import Loading from "@/components/main/Loading/Loading.vue";
 
 export default {
-  components: { LeagueItem },
+  components: { Loading, LeagueItem },
   data() {
     return {
       fixtures: [],
@@ -106,6 +119,29 @@ export default {
     capitalizeProp(prop) {
       console.log(prop);
       return prop.charAt(0).toUpperCase() + prop.slice(1);
+    },
+    async analyzeMatches() {
+      this.isLoading = true;
+      const date = format(this.date, "yyyy-MM-dd");
+      const leagueCodes = this.fixturesByDate.map((f) => f.leagueCode);
+
+      await punterApi.post("/analyze", {
+        leagueCodes,
+        date,
+      });
+
+      await this.getFixtures();
+
+      this.isLoading = false;
+    },
+    async syncMatches() {
+      this.isLoading = true;
+
+      await syncApi.post("/league/current");
+
+      await this.getFixtures();
+
+      this.isLoading = false;
     },
     async getFixtures() {
       this.isLoading = true;
@@ -178,5 +214,10 @@ export default {
 
 .date-pick-icon {
   cursor: pointer;
+}
+
+.btn-sync-matches {
+  margin-right: 15px;
+  background: #face3b !important;
 }
 </style>

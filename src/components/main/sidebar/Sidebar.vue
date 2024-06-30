@@ -24,18 +24,6 @@
             >
           </v-list-item>
         </router-link>
-        <router-link to="/backtest">
-          <v-list-item link class="sidebar-item">
-            <v-list-item-icon>
-              <v-icon class="sidebar-icon"
-                >mdi-chart-box-multiple-outline</v-icon
-              >
-            </v-list-item-icon>
-            <v-list-item-title class="sidebar-item-title"
-              >Backtest</v-list-item-title
-            >
-          </v-list-item>
-        </router-link>
         <router-link to="/fixtures-without-odds">
           <v-list-item link class="sidebar-item">
             <v-list-item-icon>

@@ -7,11 +7,21 @@
 
       <div v-if="selectedLeague && !isLoadingStrategies" class="league-select">
         <v-select
+          v-if="strategies && strategies.length > 0"
           :items="strategyNames"
           @change="selectStrategy"
           dark
         ></v-select>
+        <v-btn @click="analyzeLeague" class="league-analyze-button" v-else>
+          <template v-if="!isLoadingAnalysis">Analisar liga</template>
+          <Loading v-else color="#111" size="30" />
+        </v-btn>
       </div>
+      <Loading
+        v-if="selectedLeague && isLoadingStrategies"
+        color="#face3b"
+        size="30"
+      />
     </div>
 
     <div class="leagues-content" v-if="selectedStrategy && !isLoadingFilters">
@@ -20,7 +30,7 @@
         :key="interval.code"
         :interval="interval"
         :index="i + 1"
-        strategyName="PUNTER - Back Casa"
+        :strategyName="selectedStrategy.name"
         @activeFilter="activeFilter"
       />
     </div>
@@ -30,9 +40,10 @@
 import { leaguesApi, punterApi } from "@/config/api";
 
 import LeagueBacktestFilter from "./filters/LeagueBacktestFilter.vue";
+import Loading from "@/components/main/Loading/Loading.vue";
 
 export default {
-  components: { LeagueBacktestFilter },
+  components: { LeagueBacktestFilter, Loading },
   computed: {
     leagueNames() {
       return this.leagues.map((l) => l.name);
@@ -46,6 +57,7 @@ export default {
       isLoading: true,
       isLoadingStrategies: true,
       isLoadingFilters: false,
+      isLoadingAnalysis: false,
       leagues: [],
       strategies: [],
       selectedLeague: null,
@@ -104,6 +116,17 @@ export default {
         filter.active = filter.code === filterCode;
       }
     },
+    async analyzeLeague() {
+      this.isLoadingAnalysis = true;
+
+      await punterApi.post("", {
+        leagueCode: this.selectedLeague.code,
+      });
+
+      await this.getStrategies();
+
+      this.isLoadingAnalysis = false;
+    },
     async selectLeague(item) {
       this.selectedStrategy = null;
       const league = this.leagues.find((l) => l.name === item);
@@ -144,7 +167,10 @@ export default {
 }
 
 .league-select {
+  display: flex;
   width: 30%;
+  justify-content: center;
+  align-items: center;
 }
 
 .leagues-content {
@@ -153,5 +179,9 @@ export default {
   align-items: center;
   margin-top: 30px;
   width: 100%;
+}
+
+.league-analyze-button {
+  background: #face3b !important;
 }
 </style>

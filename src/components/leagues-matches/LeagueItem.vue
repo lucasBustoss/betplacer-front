@@ -31,7 +31,7 @@
             <td class="table-game-item-column column-match">
               {{ `${item.homeTeamName} x ${item.awayTeamName}` }}
             </td>
-            <td class="table-game-item-column column-odd">
+            <td class="table-game-item-column column-informed-odds">
               <div
                 :class="
                   item.informedOdds
@@ -44,9 +44,11 @@
                 <v-icon v-else>mdi-alpha-x-circle</v-icon>
               </div>
             </td>
-            <td class="table-game-item-column column-odd">
+            <td class="table-game-item-column column-filters">
               <div class="item-odd-container">
-                {{ item.filters }}
+                {{
+                  item.analyzedFixture ? item.filters : "Partida não analisada"
+                }}
               </div>
             </td>
             <td class="table-game-item-column">
@@ -277,9 +279,18 @@ export default {
   width: 35%;
 }
 
-.column-odd {
-  width: 10%;
+.column-informed-odds {
+  width: 15%;
   text-align: center !important;
+}
+
+.column-filters {
+  width: 20%;
+  text-align: center !important;
+}
+
+.column-btn {
+  width: 30%;
 }
 
 .item-odd-container {
